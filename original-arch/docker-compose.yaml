@@ -1,0 +1,44 @@
+services:
+  webui:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./webui:/app
+    ports:
+      - "5000:5000"
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  auth:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./auth:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  persistence:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./persistence:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  image:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./image:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  recommender:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./recommender:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - persistence

@@ -1,0 +1,98 @@
+services:
+  cart:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./cart:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  image:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./image:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  inventory:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./inventory:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  notification:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./notification:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  order:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./order:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  payment:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./payment:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  product:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./product:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  recommender:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./recommender:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  shipping:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./shipping:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  user:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./user:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+  
+  webui:
+    image: teastore-base
+    working_dir: /app
+    volumes:
+      - ./webui:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    ports:
+      - "5000:5000"
+  
+  temporal-core:
+    image: temporal-core
+    build:
+      context: "./temporal-core"
+      dockerfile: "temporal-core.Dockerfile"
+    ports:
+      - "8233:8233"
