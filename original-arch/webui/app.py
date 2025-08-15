@@ -7,213 +7,265 @@ from models import *
 app = Flask(__name__)
 app.secret_key = "123456789"
 
+@app.before_request
+def ensure_order_items():
+    if 'order_items' not in session:
+        session['order_items'] = []
+
 ### PERSISTENCE ###
 def get_category_list() -> list[Category]:
-    response = requests.get(f"http://persistence:5000/categories")
-    response.raise_for_status()  # Raise error if request failed
+    try:
+        response = requests.get(f"http://persistence:5000/categories")
+        response.raise_for_status()  # Raise error if request failed
 
-    data = response.json()
-    categories = [Category(**item) for item in data]
-    return categories
+        data = response.json()
+        categories = [Category(**item) for item in data]
+        return categories
+    except:
+        return []
 
 def get_category(category_id: int) -> Category:
-    response = requests.get(f"http://persistence:5000/categories/{category_id}")
-    response.raise_for_status()  # Raise error if request failed
+    try:
+        response = requests.get(f"http://persistence:5000/categories/{category_id}")
+        response.raise_for_status()  # Raise error if request failed
 
-    data = response.json()
-    return Category(**data)
+        data = response.json()
+        return Category(**data)
+    except:
+        return None
 
 def get_products_for_category(category_id: int) -> list[Product]:
-    response = requests.get(f"http://persistence:5000/categories/{category_id}/products")
-    response.raise_for_status()  # Raise error if request failed
+    try:
+        response = requests.get(f"http://persistence:5000/categories/{category_id}/products")
+        response.raise_for_status()  # Raise error if request failed
 
-    data = response.json()
-    products = [Product(**item) for item in data]
-    return products
+        data = response.json()
+        products = [Product(**item) for item in data]
+        return products
+    except:
+        return []
 
 def get_product(product_id: int) -> Product:
-    response = requests.get(f"http://persistence:5000/products/{product_id}")
-    response.raise_for_status()  # Raise error if request failed
+    try:
+        response = requests.get(f"http://persistence:5000/products/{product_id}")
+        response.raise_for_status()  # Raise error if request failed
 
-    data = response.json()
-    return Product(**data)
+        data = response.json()
+        return Product(**data)
+    except:
+        return None
 
 def get_products(product_ids: list[int]) -> list[Product]:
     products = []
 
     for id in product_ids:
-        products.append(get_product(id))
+        p = get_product(id)
+        if p is not None:
+            products.append(p)
     
     
     return products
 
 def get_user(user_id: int) -> User:
-    response = requests.get(f"http://persistence:5000/users/{user_id}")
-    response.raise_for_status()  # Raise error if request failed
+    try:
+        response = requests.get(f"http://persistence:5000/users/{user_id}")
+        response.raise_for_status()  # Raise error if request failed
 
-    data = response.json()
-    return User(**data)
+        data = response.json()
+        return User(**data)
+    except:
+        return None
 
 def get_user_orders(user_id: int) -> list[Order]:
-    response = requests.get(f"http://persistence:5000/users/{user_id}/orders")
-    response.raise_for_status()  # Raise error if request failed
+    try:
+        response = requests.get(f"http://persistence:5000/users/{user_id}/orders")
+        response.raise_for_status()  # Raise error if request failed
 
-    data = response.json()
-    orders = [Order(**item) for item in data]
-    return orders
+        data = response.json()
+        orders = [Order(**item) for item in data]
+        return orders
+    except:
+        return []
 
 ### IMAGE ###
 def get_images(image_names: list[str]) -> dict[str, str]:
-    query = ",".join(image_names)
-    url = f"http://image:5000/images?names={query}"
-    response = requests.get(url)
-    response.raise_for_status()  # Raise error if request failed
-    images_list = response.json()
+    try:
+        query = ",".join(image_names)
+        url = f"http://image:5000/images?names={query}"
+        response = requests.get(url)
+        response.raise_for_status()  # Raise error if request failed
+        images_list = response.json()
 
-    return images_list
-
+        return images_list
+    except:
+        return {}
 def get_image(image_name) -> str:
-    url = f"http://image:5000/images?names={image_name}"
-    response = requests.get(url)
-    response.raise_for_status()  # Raise error if request failed
-    images_list = response.json()
-    
-    return images_list.get(image_name)
+    try:
+        url = f"http://image:5000/images?names={image_name}"
+        response = requests.get(url)
+        response.raise_for_status()  # Raise error if request failed
+        images_list = response.json()
+        
+        return images_list.get(image_name)
+    except:
+        return ""
 
 ### RECOMMENDER ###
 def get_recommendations():
-    response = requests.get(f"http://recommender:5000/recommendations?num=3")
-    response.raise_for_status()
+    try:
+        response = requests.get(f"http://recommender:5000/recommendations?num=3")
+        response.raise_for_status()
 
-    data = response.json()
-    return [int(i) for i in data]
+        data = response.json()
+        return [int(i) for i in data]
+    except:
+        return []
 
 ### AUTH ###
 def is_logged_in() -> bool:
-    session_data = dict(session)
+    try:
+        session_data = dict(session)
 
-    response = requests.post("http://auth:5000/is_logged_in", json=session_data)
+        response = requests.post("http://auth:5000/is_logged_in", json=session_data)
 
-    if response.status_code == 200:
-        return True
-    else:
+        if response.status_code == 200:
+            return True
+        else:
+            return False
+    except:
         return False
 
 def call_login(username, password):
-    session_data = dict(session)
+    try:
+        session_data = dict(session)
 
-    data = {
-        "username": username,
-        "password": password,
-        "session": session_data
-    }
+        data = {
+            "username": username,
+            "password": password,
+            "session": session_data
+        }
 
-    response = requests.post("http://auth:5000/login", json=data)
+        response = requests.post("http://auth:5000/login", json=data)
 
-    new_session_data = response.json().get("new_session")
-
-    if response.status_code == 200:
-        session.clear()
-        session.update(new_session_data)
-        return True
-    
-    else:
+        if response.status_code == 200:
+            new_session_data = response.json().get("new_session")
+            session.clear()
+            session.update(new_session_data)
+            return True
+        
+        else:
+            return False
+    except:
         return False
 
 def call_logout():
-    session_data = dict(session)
+    try:
+        session_data = dict(session)
 
-    response = requests.post("http://auth:5000/logout", json=session_data)
+        response = requests.post("http://auth:5000/logout", json=session_data)
 
-    new_session_data = response.json().get("new_session")
-
-    if response.status_code == 200:
-        session.clear()
-        session.update(new_session_data)
-        return True
-    else:
+        if response.status_code == 200:
+            new_session_data = response.json().get("new_session")
+            session.clear()
+            session.update(new_session_data)
+            return True
+        else:
+            return False
+    except:
         return False
 
 def call_add_item_to_cart(product_id: int):
-    session_data = dict(session)
+    try:
+        session_data = dict(session)
 
-    data = {
-        "product_id": product_id,
-        "order_items": session_data.get("order_items", [])
-    }
+        data = {
+            "product_id": product_id,
+            "order_items": session_data.get("order_items", [])
+        }
 
-    response = requests.post("http://auth:5000/cart/add", json=data)
+        response = requests.post("http://auth:5000/cart/add", json=data)
 
-    new_order_items = response.json().get("new_order_items")
 
-    if response.status_code == 200:
-        session.update({ "order_items": new_order_items})
-        return True
-    
-    else:
+        if response.status_code == 200:
+            new_order_items = response.json().get("new_order_items")
+            session.update({ "order_items": new_order_items})
+            return True
+        
+        else:
+            return False
+    except:
         return False
 
 def call_remove_item_from_cart(product_id):
-    session_data = dict(session)
+    try:
+        session_data = dict(session)
 
-    data = {
-        "product_id": product_id,
-        "order_items": session_data.get("order_items", [])
-    }
+        data = {
+            "product_id": product_id,
+            "order_items": session_data.get("order_items", [])
+        }
 
-    print("sending:" + str(data))
+        print("sending:" + str(data))
 
-    response = requests.post("http://auth:5000/cart/remove", json=data)
+        response = requests.post("http://auth:5000/cart/remove", json=data)
 
-    new_order_items = response.json().get("new_order_items")
+        new_order_items = response.json().get("new_order_items")
 
-    print("receiving:" + str(new_order_items))
+        print("receiving:" + str(new_order_items))
 
-    if response.status_code == 200:
-        session.update({ "order_items": new_order_items})
-        return True
-    
-    else:
+        if response.status_code == 200:
+            session.update({ "order_items": new_order_items})
+            return True
+        
+        else:
+            return False
+    except:
         return False
 
 def call_update_cart(order_items: list[OrderItem]):
-    data = {
-        "order_items": [o.to_dict() for o in order_items]
-    }
+    try:
+        data = {
+            "order_items": [o.to_dict() for o in order_items]
+        }
 
-    response = requests.post("http://auth:5000/cart/update", json=data)
+        response = requests.post("http://auth:5000/cart/update", json=data)
 
-    new_order_items = response.json().get("new_order_items")
+        new_order_items = response.json().get("new_order_items")
 
-    if response.status_code == 200:
-        session.update({ "order_items": new_order_items})
-        return True
-    
-    else:
+        if response.status_code == 200:
+            session.update({ "order_items": new_order_items})
+            return True
+        
+        else:
+            return False
+    except:
         return False
 
 def call_place_order(firstname, lastname, address1, address2, cardtype, cardnumber, expirydate, total_price, order_items, user_id):
-    data = {
-        "order": {
-            "address_name": firstname + " " + lastname,
-            "address1": address1,
-            "address2": address2,
-            "total_price_in_cents": total_price,
-            "credit_card_company": cardtype,
-            "credit_card_number": cardnumber,
-            "credit_card_expiry": expirydate
-        },
-        "order_items": [o.to_dict() for o in order_items],
-        "user_id": user_id
-    }
+    try:
+        data = {
+            "order": {
+                "address_name": firstname + " " + lastname,
+                "address1": address1,
+                "address2": address2,
+                "total_price_in_cents": total_price,
+                "credit_card_company": cardtype,
+                "credit_card_number": cardnumber,
+                "credit_card_expiry": expirydate
+            },
+            "order_items": [o.to_dict() for o in order_items],
+            "user_id": user_id
+        }
 
-    response = requests.post("http://auth:5000/place_order", json=data)
+        response = requests.post("http://auth:5000/place_order", json=data)
 
-    if response.status_code == 200:
-        session.update({ "order_items": []})
-        return True
-    
-    else:
+        if response.status_code == 200:
+            session.update({ "order_items": []})
+            return True
+        
+        else:
+            return False
+    except:
         return False
 
 
@@ -225,7 +277,6 @@ def render_template_base(template, **context):
 
 @app.route("/")
 def index():
-
     category_list = get_category_list()
     return render_template_base("index.html", category_list=category_list)
 
@@ -356,11 +407,10 @@ def product():
         return render_template_base("error.html", message=message)
 
     product = get_product(product_id)
-
-    image = get_image(product.img_name)
-
-    # Add the base64 image to the product dict
-    product.image = image
+    if product is not None:
+        image = get_image(product.img_name)
+        # Add the base64 image to the product dict
+        product.image = image
 
     ads_ids = get_recommendations()
     """
@@ -371,11 +421,12 @@ def product():
 
     ads = get_products(ads_ids)
 
-    ad_images = get_images([p.img_name for p in ads])
+    ad_images = get_images([p.img_name for p in ads if p is not None])
 
     # Add the base64 image to the product dict
     for p in ads:
-        p.image = ad_images[p.img_name]
+        if p is not None:
+            p.image = ad_images.get(p.img_name)
 
     ads = ads[:3]
 
@@ -402,7 +453,7 @@ def cart():
     products = get_products([i.get("product_id") for i in order_items])
 
     products_map = {
-        p.id : p for p in products
+        p.id : p for p in products if p is not None
     }
 
     ads_ids = get_recommendations()
@@ -414,7 +465,7 @@ def cart():
 
     ads = get_products(ads_ids)
 
-    ad_images = get_images([p.img_name for p in ads])
+    ad_images = get_images([p.img_name for p in ads if p is not None])
     """
     {
         "<image_name>": <image in base64> 
@@ -423,7 +474,8 @@ def cart():
 
     # Add the base64 image to the product dict
     for p in ads:
-        p.image = ad_images[p.img_name]
+        if p is not None:
+            p.image = ad_images.get(p.img_name)
 
     ads = ads[:3]
 
@@ -515,12 +567,12 @@ def place_order():
     products = get_products([i.product_id for i in order_items])
 
     products_map = {
-        p.id : p.price_in_cents for p in products
+        p.id : p.price_in_cents for p in products if p is not None
     }
 
     total_price = 0
     for item in order_items:
-        total_price += item.quantity * products_map[item.product_id]
+        total_price += item.quantity * products_map.get(item.product_id, 0)
 
     user_id = session.get("user_id")
 

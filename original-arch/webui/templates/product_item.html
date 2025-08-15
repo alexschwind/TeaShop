@@ -1,7 +1,9 @@
 <div class="thumbnail">
+	{% if product %}
 	<form action="/cart/add" method="POST">
 		<table>
 			<tr>
+				
 				<td class="productthumb">
 					<input type='hidden' name="productid" value="{{ product.id }}">
 					<a href="/product?id={{ product.id }}"><img src="{{ product.image }}" alt="{{ product.name }}"></a>
@@ -12,7 +14,9 @@
 					<b>{{ product.name }}</b> <br> <span> Price: ${{ product.price_in_cents/100 }}
 					</span><br> <span>{{ product.description }}</span>
 				</td>
+				
 			</tr>
 		</table><input name="addToCart" class="btn" value="Add to Cart" type="submit">
 	</form>
+	{% endif %}
 </div>

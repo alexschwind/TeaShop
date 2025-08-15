@@ -7,8 +7,10 @@
 	<div class="row">
 		{% include "categorylist.html"%}
 		<div class="col-sm-6 col-md-6 col-lg-8">
+			{% if product %}
 			<form action="/cart/add" method="POST">
 				<div class="row">
+					
 					<input type='hidden' name="productid" value="{{ product.id }}">
 					<div class="col-sm-12 showcase"><div>
 					<h2 class="minipage-title">{{ product.name }}</h2>
@@ -19,9 +21,11 @@
 						<span>Price: ${{ product.price_in_cents/100 }}</span><br/>
 						<input name="addToCart" class="btn" value="Add to Cart" type="submit">
 					</div></div>
+					
 				</div>
 				
 			</form>
+			{% endif %}
 		</div>
 		{% include "recommender.html"%}
 	</div>

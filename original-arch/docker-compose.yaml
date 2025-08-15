@@ -1,6 +1,8 @@
 services:
   webui:
-    image: teastore-base
+    build:
+      context: ./webui
+      dockerfile: ../Dockerfile
     working_dir: /app
     volumes:
       - ./webui:/app
@@ -10,7 +12,9 @@ services:
       - PYTHONUNBUFFERED=1
 
   auth:
-    image: teastore-base
+    build:
+      context: ./auth
+      dockerfile: ../Dockerfile
     working_dir: /app
     volumes:
       - ./auth:/app
@@ -18,7 +22,9 @@ services:
       - PYTHONUNBUFFERED=1
 
   persistence:
-    image: teastore-base
+    build:
+      context: ./persistence
+      dockerfile: ../Dockerfile
     working_dir: /app
     volumes:
       - ./persistence:/app
@@ -26,7 +32,9 @@ services:
       - PYTHONUNBUFFERED=1
 
   image:
-    image: teastore-base
+    build:
+      context: ./image
+      dockerfile: ../Dockerfile
     working_dir: /app
     volumes:
       - ./image:/app
@@ -34,7 +42,9 @@ services:
       - PYTHONUNBUFFERED=1
 
   recommender:
-    image: teastore-base
+    build:
+      context: ./recommender
+      dockerfile: ../Dockerfile
     working_dir: /app
     volumes:
       - ./recommender:/app

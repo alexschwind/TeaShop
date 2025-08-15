@@ -18,7 +18,6 @@
                     <div class="col-sm-6">
                         <ul class="pagination">
                             {% for pagination_item in pagination %}
-                            {{ pagination_item }}
                             {% if pagination_item == "previous" %}
                             <li><a href="/category?category={{ category.id }}&page={{ current_page_number-1 }}">{{ pagination_item }}</a>
                             </li>

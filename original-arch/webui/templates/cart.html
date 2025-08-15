@@ -26,8 +26,8 @@
                         {% for item in order_items %}
                         <tr>
                             <td>{{ item.product_id }}</td>
-                            <td>{{ products[item.product_id].name }}</td>
-                            <td>{{ products[item.product_id].description }}</td>
+                            <td>{{ products.get(item.product_id, {"name": ""}).name }}</td>
+                            <td>{{ products.get(item.product_id, {"description": ""}).description }}</td>
 
                             <td>
                                 <input required min="1" name="quantity_{{ item.product_id }}" type="number"
@@ -35,10 +35,10 @@
                             </td>
 
                             <td>
-                                ${{ products[item.product_id].price_in_cents / 100 }}
+                                ${{ products.get(item.product_id, {"price_in_cents": 0}).price_in_cents / 100 }}
                             </td>
                             <td>
-                                ${{ products[item.product_id].price_in_cents * item.quantity / 100 }}
+                                ${{ products.get(item.product_id, {"price_in_cents": 0}).price_in_cents * item.quantity / 100 }}
                             </td>
 
                             <td>
